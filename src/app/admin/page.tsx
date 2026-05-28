@@ -29,13 +29,14 @@ export default async function AdminPage() {
     supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(50)
   ]);
 
-  const courts = (courtsRes.data as Court[] | null) ?? [];
-  const games = (gamesRes.data as Array<Game & { courts: { name: string } }> | null) ?? [];
-  const receipts =
-    (receiptsRes.data as Array<RentalReceipt & {
-      games: { title: string; courts: { name: string } };
-    }> | null) ?? [];
-  const users = (usersRes.data as Profile[] | null) ?? [];
+  type AdminGameRow = Game & { courts: { name: string } };
+  type AdminReceiptRow = RentalReceipt & {
+    games: { title: string; courts: { name: string } };
+  };
+  const courts = ((courtsRes.data ?? []) as unknown as Court[]);
+  const games = ((gamesRes.data ?? []) as unknown as AdminGameRow[]);
+  const receipts = ((receiptsRes.data ?? []) as unknown as AdminReceiptRow[]);
+  const users = ((usersRes.data ?? []) as unknown as Profile[]);
 
   return (
     <div className="space-y-8">

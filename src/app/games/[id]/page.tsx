@@ -35,7 +35,7 @@ const SELECT = `*,
 async function loadGame(id: string, token?: string): Promise<GameRow | null> {
   const supabase = createSupabaseServerClient();
   const { data } = await supabase.from("games").select(SELECT).eq("id", id).maybeSingle();
-  if (data) return data as GameRow;
+  if (data) return data as unknown as GameRow;
 
   // RLS blocked the read (likely a private game) — fall back to admin lookup when invite token matches.
   if (token) {
@@ -46,7 +46,7 @@ async function loadGame(id: string, token?: string): Promise<GameRow | null> {
       .eq("id", id)
       .eq("invite_token", token)
       .maybeSingle();
-    return (priv as GameRow | null) ?? null;
+    return (priv as unknown as GameRow | null) ?? null;
   }
   return null;
 }

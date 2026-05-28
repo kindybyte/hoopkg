@@ -35,18 +35,20 @@ export default async function ProfilePage() {
       .limit(20)
   ]);
 
-  const mine = (mineRes.data as Array<Game & {
+  type MineRow = Game & {
     courts: Pick<Court, "id" | "name" | "type">;
     game_participants: Array<{ status: string }>;
-  }> | null) ?? [];
+  };
+  const mine = ((mineRes.data ?? []) as unknown as MineRow[]);
 
-  const joinedRaw = (joinedRes.data ?? []) as Array<{
+  type JoinedRow = {
     games: Game & {
       courts: Pick<Court, "id" | "name" | "type">;
       game_participants: Array<{ status: string }>;
     };
-  }>;
-  const joined = joinedRaw.filter((row) => row.games.creator_id !== user.id).slice(0, 10);
+  };
+  const joinedRaw = (joinedRes.data ?? []) as unknown as JoinedRow[];
+  const joined = joinedRaw.filter((row) => row.games?.creator_id !== user.id).slice(0, 10);
 
   return (
     <div className="space-y-6">

@@ -34,10 +34,11 @@ export default async function CourtDetailPage({ params }: { params: { id: string
     .order("starts_at", { ascending: true })
     .limit(20);
 
-  const games = (gamesData as Array<Game & {
+  type GameRow = Game & {
     courts: Pick<Court, "id" | "name" | "type">;
     game_participants: Array<{ status: string }>;
-  }> | null) ?? [];
+  };
+  const games = ((gamesData ?? []) as unknown as GameRow[]);
 
   let presentCount = 0;
   let userPresent = false;

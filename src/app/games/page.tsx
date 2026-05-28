@@ -44,10 +44,11 @@ export default async function GamesPage({
   if (searchParams.court) query = query.eq("court_id", searchParams.court);
 
   const { data } = await query;
-  const games = (data as Array<Game & {
+  type GameRow = Game & {
     courts: Pick<Court, "id" | "name" | "type">;
     game_participants: Array<{ status: string }>;
-  }> | null) ?? [];
+  };
+  const games = ((data ?? []) as unknown as GameRow[]);
 
   return (
     <div className="space-y-5">

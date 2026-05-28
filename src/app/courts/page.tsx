@@ -17,7 +17,7 @@ export default async function CourtsPage({
   if (searchParams.type === "paid") q = q.eq("type", "paid");
   if (searchParams.type === "free") q = q.eq("type", "free");
   const { data } = await q;
-  const courts = (data as Court[] | null) ?? [];
+  const courts = ((data ?? []) as unknown as Court[]);
 
   const cutoff = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
   const presenceCounts: Record<string, number> = {};

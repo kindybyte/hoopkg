@@ -28,10 +28,12 @@ export default async function HomePage() {
       .limit(6)
   ]);
 
-  const courts = (courtsRes.data as Court[] | null) ?? [];
-  const games = (gamesRes.data as Array<
-    Game & { courts: Pick<Court, "id" | "name" | "type">; game_participants: Array<{ status: string }> }
-  > | null) ?? [];
+  type GameWithCourt = Game & {
+    courts: Pick<Court, "id" | "name" | "type">;
+    game_participants: Array<{ status: string }>;
+  };
+  const courts = ((courtsRes.data ?? []) as unknown as Court[]);
+  const games = ((gamesRes.data ?? []) as unknown as GameWithCourt[]);
 
   return (
     <div className="space-y-10">

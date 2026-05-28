@@ -16,7 +16,7 @@ export default async function NewGamePage() {
     .select("*")
     .eq("status", "active")
     .order("name");
-  const courts = (data as Court[] | null) ?? [];
+  const courts = ((data ?? []) as unknown as Court[]);
 
   return (
     <div className="mx-auto max-w-xl space-y-5">
