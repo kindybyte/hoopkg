@@ -56,6 +56,19 @@ export function CourtUpsertForm({ court }: { court?: Court }) {
         <textarea name="description" rows={3} defaultValue={court?.description ?? ""} className="input" />
       </div>
       <div>
+        <label className="label">Номер для брони</label>
+        <input
+          name="booking_phone"
+          type="tel"
+          defaultValue={court?.booking_phone ?? ""}
+          placeholder="+996700123456"
+          className="input"
+        />
+        <p className="mt-1 text-xs text-ink/60">
+          Телефон, по которому игроки бронируют зал. Покажется на странице площадки.
+        </p>
+      </div>
+      <div>
         <label className="label">Статус</label>
         <select name="status" defaultValue={court?.status ?? "active"} className="input">
           <option value="active">Активна</option>

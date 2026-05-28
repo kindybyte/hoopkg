@@ -78,6 +78,12 @@ export const courtUpsertSchema = z.object({
   photo_url: z.string().url().optional().or(z.literal("")),
   price_per_hour: z.coerce.number().int().min(0).max(1000000),
   description: z.string().trim().max(500).optional().or(z.literal("")),
+  booking_phone: z
+    .string()
+    .trim()
+    .max(40)
+    .optional()
+    .or(z.literal("")),
   status: z.enum(["active", "hidden"]).default("active")
 });
 

@@ -18,6 +18,7 @@ export async function upsertCourt(_prev: ActionState, formData: FormData): Promi
     photo_url: formData.get("photo_url") || "",
     price_per_hour: formData.get("price_per_hour"),
     description: formData.get("description") || "",
+    booking_phone: formData.get("booking_phone") || "",
     status: formData.get("status") || "active"
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Проверьте поля" };
@@ -32,6 +33,7 @@ export async function upsertCourt(_prev: ActionState, formData: FormData): Promi
     photo_url: parsed.data.photo_url || null,
     price_per_hour: parsed.data.price_per_hour,
     description: parsed.data.description || null,
+    booking_phone: parsed.data.booking_phone || null,
     status: parsed.data.status
   };
 

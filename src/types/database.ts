@@ -32,6 +32,7 @@ export interface Court {
   photo_url: string | null;
   price_per_hour: number;
   description: string | null;
+  booking_phone: string | null;
   status: CourtStatus;
   created_at: string;
   updated_at: string;
