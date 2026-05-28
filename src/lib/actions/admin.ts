@@ -74,3 +74,13 @@ export async function blockUser(id: string, blocked: boolean): Promise<ActionSta
   revalidatePath("/admin");
   return { ok: true };
 }
+
+export async function deleteCourt(id: string): Promise<ActionState> {
+  await requireAdmin();
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("courts").delete().eq("id", id);
+  if (error) return { error: `Не удалось удалить площадку: ${error.message}` };
+  revalidatePath("/admin");
+  revalidatePath("/courts");
+  return { ok: true };
+}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 import { CourtCard } from "@/components/CourtCard";
 import { EmptyState } from "@/components/EmptyState";
 import type { Court } from "@/types/database";
@@ -13,6 +14,8 @@ export default async function CourtsPage({
   searchParams: { type?: string };
 }) {
   const supabase = createSupabaseServerClient();
+  const user = await getCurrentUser();
+
   let q = supabase.from("courts").select("*").eq("status", "active").order("name");
   if (searchParams.type === "paid") q = q.eq("type", "paid");
   if (searchParams.type === "free") q = q.eq("type", "free");
@@ -21,13 +24,15 @@ export default async function CourtsPage({
 
   const cutoff = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
   const presenceCounts: Record<string, number> = {};
+  const userPresentSet = new Set<string>();
   if (courts.length > 0) {
     const { data: rows } = await supabase
       .from("court_presence")
-      .select("court_id")
+      .select("court_id, user_id")
       .gt("updated_at", cutoff);
-    for (const r of (rows ?? []) as Array<{ court_id: string }>) {
+    for (const r of (rows ?? []) as Array<{ court_id: string; user_id: string }>) {
       presenceCounts[r.court_id] = (presenceCounts[r.court_id] ?? 0) + 1;
+      if (user && r.user_id === user.id) userPresentSet.add(r.court_id);
     }
   }
 
@@ -61,7 +66,12 @@ export default async function CourtsPage({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {courts.map((c) => (
-            <CourtCard key={c.id} court={c} presentNow={presenceCounts[c.id] ?? 0} />
+            <CourtCard
+              key={c.id}
+              court={c}
+              presentNow={presenceCounts[c.id] ?? 0}
+              userPresent={userPresentSet.has(c.id)}
+            />
           ))}
         </div>
       )}

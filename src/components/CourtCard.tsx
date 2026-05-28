@@ -1,8 +1,17 @@
 import Link from "next/link";
 import type { Court } from "@/types/database";
 import { formatPrice } from "@/lib/format";
+import { FreeCourtPresence } from "@/components/FreeCourtPresence";
 
-export function CourtCard({ court, presentNow }: { court: Court; presentNow?: number }) {
+export function CourtCard({
+  court,
+  presentNow,
+  userPresent
+}: {
+  court: Court;
+  presentNow?: number;
+  userPresent?: boolean;
+}) {
   return (
     <div className="card overflow-hidden">
       {court.photo_url ? (
@@ -22,12 +31,18 @@ export function CourtCard({ court, presentNow }: { court: Court; presentNow?: nu
           <span className="chip">{court.type === "paid" ? "Платный зал" : "Бесплатно"}</span>
         </div>
         <p className="mt-1 text-sm text-ink/70">{court.address}</p>
-        <div className="mt-2 flex items-center justify-between text-sm">
-          <span className="font-medium">{formatPrice(court.price_per_hour)}</span>
-          {court.type === "free" && typeof presentNow === "number" && (
-            <span className="text-ink/70">Сейчас на площадке: {presentNow}</span>
-          )}
-        </div>
+        <p className="mt-2 text-sm font-medium">{formatPrice(court.price_per_hour)}</p>
+
+        {court.type === "free" && (
+          <div className="mt-3">
+            <FreeCourtPresence
+              courtId={court.id}
+              initialCount={presentNow ?? 0}
+              initialUserPresent={userPresent ?? false}
+            />
+          </div>
+        )}
+
         <div className="mt-3 flex gap-2">
           <Link href={`/courts/${court.id}`} className="btn-ghost flex-1 !py-2 text-sm">
             Подробнее
