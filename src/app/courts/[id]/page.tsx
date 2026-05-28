@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { GameCard } from "@/components/GameCard";
 import { PresenceButtons } from "@/components/PresenceButtons";
+import { CourtMap } from "@/components/CourtMap";
 import { EmptyState } from "@/components/EmptyState";
 import { formatPrice } from "@/lib/format";
 import type { Court, Game } from "@/types/database";
@@ -74,23 +75,29 @@ export default async function CourtDetailPage({ params }: { params: { id: string
           <p className="mt-1 text-sm text-ink/70">{c.address}</p>
           <p className="mt-2 font-medium">{formatPrice(c.price_per_hour)}{c.type === "paid" ? " / час" : ""}</p>
           {c.description && <p className="mt-3 text-sm text-ink/80">{c.description}</p>}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Link href={`/games/new?court=${c.id}`} className="btn-accent flex-1">
               Создать игру здесь
             </Link>
             {c.lat && c.lng && (
               <a
                 className="btn-ghost flex-1"
-                href={`https://2gis.kg/bishkek/geo/${c.lng},${c.lat}`}
+                href={`https://2gis.kg/bishkek/directions/points/%7C${c.lng},${c.lat}`}
                 target="_blank"
                 rel="noreferrer"
               >
-                На карте
+                Как добраться
               </a>
             )}
           </div>
         </div>
       </header>
+
+      {c.lat && c.lng && (
+        <section>
+          <CourtMap lat={c.lat} lng={c.lng} name={c.name} />
+        </section>
+      )}
 
       {c.type === "free" && user && (
         <PresenceButtons
