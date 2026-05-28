@@ -30,6 +30,14 @@ export const loginEmailSchema = z.object({
   email: z.string().trim().email("Введите корректный email")
 });
 
+export const emailPasswordSchema = z.object({
+  email: z.string().trim().email("Введите корректный email"),
+  password: z
+    .string()
+    .min(6, "Пароль должен быть не короче 6 символов")
+    .max(72, "Слишком длинный пароль")
+});
+
 export const loginPhoneSchema = z.object({
   phone: phoneSchema
 });
