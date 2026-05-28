@@ -24,7 +24,17 @@ export async function signInWithPassword(
   }
   const supabase = createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) return { error: "Неверный email или пароль." };
+  if (error) {
+    console.error("[signInWithPassword]", error.status, error.code, error.message);
+    const msg = (error.message ?? "").toLowerCase();
+    if (msg.includes("email not confirmed")) {
+      return { error: "Email не подтверждён. Открой ссылку из письма." };
+    }
+    if (msg.includes("invalid") || msg.includes("credentials")) {
+      return { error: "Неверный email или пароль." };
+    }
+    return { error: `Не удалось войти: ${error.message}` };
+  }
   redirect("/games");
 }
 
@@ -46,10 +56,27 @@ export async function signUpWithPassword(
     options: { emailRedirectTo: `${env.SITE_URL}/auth/callback` }
   });
   if (error) {
-    if (error.message?.toLowerCase().includes("already")) {
+    console.error("[signUpWithPassword]", error.status, error.code, error.message);
+    const msg = (error.message ?? "").toLowerCase();
+    if (msg.includes("already") || msg.includes("registered")) {
       return { error: "Этот email уже зарегистрирован. Войди через форму входа." };
     }
-    return { error: "Не удалось создать аккаунт. Попробуй ещё раз." };
+    if (msg.includes("rate") || msg.includes("too many")) {
+      return { error: "Слишком много попыток. Подожди минуту и попробуй ещё раз." };
+    }
+    if (msg.includes("disabled") || msg.includes("not enabled") || msg.includes("signups not allowed")) {
+      return {
+        error:
+          "Регистрация по email выключена в Supabase. В Dashboard → Authentication → Providers → Email включи 'Enable Email Signup'."
+      };
+    }
+    if (msg.includes("smtp") || msg.includes("send email")) {
+      return {
+        error:
+          "Supabase не смог отправить письмо подтверждения. Сними 'Confirm email' в Authentication → Providers → Email или настрой SMTP."
+      };
+    }
+    return { error: `Не удалось создать аккаунт: ${error.message}` };
   }
   if (data.session) {
     redirect("/profile");
